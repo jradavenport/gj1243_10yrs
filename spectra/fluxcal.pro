@@ -1,9 +1,10 @@
+; .r /Users/james/idl/pro/remove
+; .r /Users/james/idl/pro/planck
+
 pro fluxcal
   set_plot,'X'
   plotstuff,/set,/silent
 
-  ; .r /Users/james/idl/pro/remove
-  ; .r /Users/james/idl/pro/planck
 
   loadct,39,/silent
   ;===== compute the flux calibration for this target
@@ -13,6 +14,12 @@ pro fluxcal
 
   readcol, 'GJ1243_PMSU1.txt', wave_cal, flux_cal, /silent
   remove,where(wave_cal gt 7500), wave_cal, flux_cal
+
+  flux_cal = flux_cal * 2.
+
+  ; From LAMOST DR5... but alas, not flux calibrated. nvm
+  ; L_file = 'spec-56561-KP195920N454621V02_sp14-168.fits'
+  ; lamost = mrdfits(L_file,1)
 
   ;; sort spectrum, if needed...
   ;ss = sort(wave_cal)
@@ -81,6 +88,7 @@ pro fluxcal
 
 
   plx = 83.4814  ; mas
+  plx_err = 0.0366
   dist = 1000. / plx * !pc
 
   print,'Distance (pc) = ',dist / !pc
@@ -93,7 +101,8 @@ pro fluxcal
   L_POINTk = alog10(TSUM(std_wave2k, std_flux2k * trans_f2k) * $
                     (2. * !dpi * dist^2.))
 
-  print,'log LUMINOSITY = ',l_point, l_pointk
+  print,'log LUMINOSITY TESS = ',l_point
+  print,'log LUMINOSITY KEPLER = ', l_pointk
 
 
   bb10_tess = planck(std_wave2, 10000)
@@ -117,6 +126,6 @@ pro fluxcal
 
   set_plot,'X'
 
-
+  stop
   return
 end
